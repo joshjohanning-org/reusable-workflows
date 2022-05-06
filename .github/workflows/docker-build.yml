@@ -1,4 +1,4 @@
-name: terraform plan # this doesn't show up in ui
+name: docker build # this doesn't show up in ui
 
 on:
   workflow_call:
@@ -7,65 +7,45 @@ on:
         description: Platform to execute on
         type: string
         default: ubuntu-latest
-      additional-args:
-        description: Additional arguments to pass in
+      image-repository:
+        description: where to publish/tag image
         type: string
-        default: ""
-      var-file:
-        description: Environment variable file
+        default: "ghcr.io"
+      image-name:
+        description: image name
         type: string
-        default: ""
-      backend-arg:
-        description: Environment backend arguments
+        default: "${{ github.repository }}"
+      image-tag:
+        description: image tag
         type: string
-        default: ""
-      working-directory:
-        description: Working directory
+        default: "${{ github.run_number }}"
+      dockerfile-path:
+        description: image tag
         type: string
-        default: .
-      artifact-name:
-        description: Artifact name for plan
-        type: string
-        default: plan
+        default: "Dockerfile"
 
 jobs:
-  terraform-plan:
-    name: plan  
+  docker-build:
+    name: docker-build  
     runs-on: ${{ inputs.runs-on }}
-    environment: dev
-    defaults:
-      run:
-        working-directory: ${{ inputs.working-directory }}
         
     steps:
-      - uses: actions/checkout@v2
+    - uses: actions/checkout@v2
+    
+    - name: Build the Docker image
+      run: docker build . --file ${{ inputs.dockerfile-path }} --tag ${{ inputs.image-repository }}/${{ inputs.image-name }}:${{ inputs.image-tag }}
       
-      - run: echo "env secret- $secret"
-        env: 
-          secret: ${{ secrets.MY_SECRET }}
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v1
+      with:
+        registry: ${{ inputs.image-repository }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.github_token }}
+        
+    - name: Push the docker Image
+      run: |
+        docker push ${{ inputs.image-repository }}/${{ inputs.image-name }}:${{ inputs.image-tag }}
+        docker tag ${{ inputs.image-repository }}/${{ inputs.image-name }}:${{ inputs.image-tag }} ${{ inputs.image-repository }}/${{ inputs.image-name }}:latest
+        docker push ${{ inputs.image-repository }}/${{ inputs.image-name }}:latest
       
-      - run: echo "repo secret- $secret"
-        env:
-          secret: ${{ secrets.MY_REPO_SECRET }}
-      
-      - id: foo
-        uses: joshjohanning-workflows/composite-sample@main
-        with:
-          who-to-greet: 'Mona the Octocat'
-          my-test-input: ${{ secrets.MY_SECRET }}
-      
-      - name: terraform versoin
-        run: terraform -v
-      
-      - name: terraform plan
-        run: | 
-          # terraform init -input=false ${{ inputs.backend-arg }}
-          # terraform plan -input=false -var-file=${{ inputs.var-file }} ${{ inputs.additional-args }} -out="out.plan"
-          touch out.plan
-          
-      - name: Upload a Build Artifact
-        uses: actions/upload-artifact@v2.2.2
-        with:
-          name: ${{ inputs.artifact-name }}
-          path: ${{ inputs.working-directory }}/out.plan
-          if-no-files-found: error
+    
