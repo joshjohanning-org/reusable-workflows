@@ -11,6 +11,10 @@ on:
         description: artifact name to download
         type: string
         default: build
+      environment:
+        description: environment in github to target
+        type: string
+        default: dev
     secrets:
       conn_str:
         required: true
@@ -18,6 +22,9 @@ on:
 jobs:
   deploy:
     runs-on: ${{ inputs.runs-on }}
+    environment:
+      name: ${{ inputs.environment }}
+      url: https://${{ inputs.environment }}.mycompany.com
         
     steps:
     - uses: actions/download-artifact@v3
