@@ -25,8 +25,8 @@ on:
         default: "Dockerfile"
 
 jobs:
-  docker-build:
-    name: docker-build  
+  build:
+    name: build  
     runs-on: ${{ inputs.runs-on }}
         
     steps:
@@ -48,18 +48,18 @@ jobs:
         docker tag ${{ inputs.image-repository }}/${{ inputs.image-name }}:${{ inputs.image-tag }} ${{ inputs.image-repository }}/${{ inputs.image-name }}:latest
         docker push ${{ inputs.image-repository }}/${{ inputs.image-name }}:latest
       
-  docker-deploy-dev:
-    name: docker-deploy-dev  
+  deploy-dev:
+    name: deploy-dev  
     runs-on: ${{ inputs.runs-on }}
-    needs: [docker-build]
+    needs: [build]
     
     steps:
     - run: echo "deploy"
     
-  docker-deploy-qa:
-    name: docker-deploy-qa  
+  deploy-qa:
+    name: deploy-qa  
     runs-on: ${{ inputs.runs-on }}
-    needs: [docker-deploy-dev]
+    needs: [deploy-dev]
     
     steps:
     - run: echo "deploy"   
