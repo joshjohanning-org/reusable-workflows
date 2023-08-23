@@ -25,13 +25,16 @@ on:
         default: "Dockerfile"
     secrets:
       registry_password:
-        required: true
+        required: false
 
 jobs:
   docker-build:
     name: docker-build  
     runs-on: ${{ inputs.runs-on }}
-        
+    permissions:
+      contents: read
+      packages: write
+
     steps:
     - uses: actions/checkout@v3
     
@@ -48,11 +51,10 @@ jobs:
         registry: ${{ inputs.image-repository }}
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
-        
+
     - name: Push the docker Image
+      if: github.actor != 'dependabot[bot]'
       run: |
         docker push ${{ inputs.image-repository }}/${{ inputs.image-name }}:${{ inputs.image-tag }}
         docker tag ${{ inputs.image-repository }}/${{ inputs.image-name }}:${{ inputs.image-tag }} ${{ inputs.image-repository }}/${{ inputs.image-name }}:latest
         docker push ${{ inputs.image-repository }}/${{ inputs.image-name }}:latest
-      
-    
