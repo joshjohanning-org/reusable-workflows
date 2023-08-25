@@ -44,7 +44,7 @@ jobs:
     # use cli instead of action to show secrets in reusable workflows
     # - name: login to cr
     #   run: echo ${{ secrets.registry_password }} | docker login --username foo --password-stdin
-    
+
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v2
       with:
