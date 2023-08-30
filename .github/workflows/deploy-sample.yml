@@ -14,7 +14,7 @@ on:
       environment:
         description: environment in github to target
         type: string
-        default: dev
+        required: true
     secrets:
       conn_str:
         required: true
