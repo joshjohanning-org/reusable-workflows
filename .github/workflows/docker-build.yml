@@ -23,7 +23,7 @@ on:
         description: image tag
         type: string
         default: "Dockerfile"
-# optional
+# optional with secrets: inherit
 #    secrets:
 #      registry_password:
 #        required: false
@@ -43,7 +43,7 @@ jobs:
       run: docker build . --file ${{ inputs.dockerfile-path }} --tag ${{ inputs.image-repository }}/${{ inputs.image-name }}:${{ inputs.image-tag }}
 
     - name: test secret
-      run: echo "${{ secrets.registry_password }}"
+      run: echo "${{ secrets.registry_password }}" # this will show up as ***
 
     # use cli instead of action to show secrets in reusable workflows
     # - name: login to cr
