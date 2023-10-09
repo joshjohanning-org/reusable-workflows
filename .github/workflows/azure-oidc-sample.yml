@@ -10,7 +10,7 @@ on:
       keyvault:
         description: name of the keyvault
         type: string
-        default: josh-key-vault-test       
+        default: josh-key-vault-test 
 
 # # set this in caller workflow: 
 # permissions:
@@ -49,6 +49,5 @@ jobs:
         
     - name: testing secrets
       run: |
-        echo "echoing as secret: ${{ secrets.othersecret }}" # doesn't work
-        echo "echoing as env: ${{ env.othersecret }}" # works
-
+        echo "echoing as secret: ${{ secrets.my-secret }}" # doesn't work
+        echo "echoing as env: ${{ env.my-secret }}" # works
