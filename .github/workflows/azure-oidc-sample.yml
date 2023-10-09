@@ -14,7 +14,7 @@ on:
 #   contents: read # this is needed to clone repo
 
 jobs:
-  azure:
+  login:
     runs-on: ${{ inputs.runs-on }}
     permissions:
       id-token: write # this is needed for oidc
