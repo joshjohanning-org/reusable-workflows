@@ -7,6 +7,10 @@ on:
         description: Platform to execute on
         type: string
         default: ubuntu-latest
+      keyvault:
+        description: name of the keyvault
+        type: string
+        default: josh-key-vault-test       
 
 # # set this in caller workflow: 
 # permissions:
@@ -37,8 +41,8 @@ jobs:
         
     - name: get all az keyvault secrets
       run: |
-        for secret_name in $(az keyvault secret list --vault-name test-vault --query "[].{name:name}" --output tsv); do
-          secret_value=$(az keyvault secret show --vault-name "test-vault" --name $secret_name --query value -o tsv)
+        for secret_name in $(az keyvault secret list --vault-name ${{ inputs.keyvault }} --query "[].{name:name}" --output tsv); do
+          secret_value=$(az keyvault secret show --vault-name "${{ inputs.keyvault }}" --name $secret_name --query value -o tsv)
           echo "::add-mask::$secret_value"
           echo "$secret_name=$secret_value" >> $GITHUB_ENV
         done
