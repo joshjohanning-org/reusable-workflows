@@ -1,0 +1,21 @@
+name: reusable-workflow-call-composite-action
+
+on:
+  workflow_call:
+    inputs:
+      runs-on:
+        description: Platform to execute on
+        type: string
+        default: ubuntu-latest
+jobs:
+  build:
+    runs-on: ${{ inputs.runs-on }}
+    permissions:
+      contents: read
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - uses: joshjohanning-org/reusable-workflows/composite-action.yml@add-composite-action
+      with:
+        who-to-greet: mona
