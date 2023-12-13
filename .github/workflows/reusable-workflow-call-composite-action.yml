@@ -7,11 +7,16 @@ on:
         description: Platform to execute on
         type: string
         default: ubuntu-latest
+      environment:
+        description: environment in github
+        type: string
+        default: dev
 jobs:
   build:
     runs-on: ${{ inputs.runs-on }}
     permissions:
       contents: read
+    environment: ${{ inputs.environment }}
 
     steps:
     - uses: actions/checkout@v4
