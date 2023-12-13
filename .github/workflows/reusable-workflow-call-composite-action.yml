@@ -21,6 +21,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - uses: joshjohanning-org/reusable-workflows/composite-action.yml@add-composite-action
+    - uses: joshjohanning-org/reusable-workflows/composite-action@add-composite-action
       with:
         who-to-greet: mona
