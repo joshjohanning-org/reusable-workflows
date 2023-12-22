@@ -1,4 +1,4 @@
-name: azure-oidc-sample # this doesn't show up in ui
+name: azure-oidc-sample
 
 on:
   workflow_call:
@@ -12,14 +12,10 @@ on:
         type: string
         default: josh-key-vault-test 
 
-# # set this in caller workflow: 
-# permissions:
-#   id-token: write # this is needed for oidc
-#   contents: read # this is needed to clone repo
-
 jobs:
   login:
     runs-on: ${{ inputs.runs-on }}
+    # set this in caller workflow if using separate organization/enterprise
     permissions:
       id-token: write # this is needed for oidc
       contents: read # this is needed to clone repo
