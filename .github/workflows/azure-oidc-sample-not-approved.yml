@@ -1,0 +1,49 @@
+name: azure-oidc-sample
+
+on:
+  workflow_call:
+    inputs:
+      runs-on:
+        description: Platform to execute on
+        type: string
+        default: ubuntu-latest
+      keyvault:
+        description: name of the keyvault
+        type: string
+        default: josh-key-vault-test 
+
+jobs:
+  login:
+    runs-on: ${{ inputs.runs-on }}
+    # set this in caller workflow if using separate organization/enterprise
+    permissions:
+      id-token: write # this is needed for oidc
+      contents: read # this is needed to clone repo
+
+    steps:
+    - uses: actions/checkout@v4
+    # logging in with OIDC
+    - name: 'Az CLI login'
+      uses: azure/login@v1
+      with:
+        client-id: d951ac80-75f2-446a-aca6-cd53a68611f0
+        tenant-id: e9846558-c4f0-4312-a89e-ebebe80779a1
+        subscription-id: 2e9bfb26-ca29-44f5-8920-72c1b0b37188
+        
+    - name: just show some sub stuff
+      run: |
+        az account show
+        az account show | jq ".id"
+        
+    - name: get all az keyvault secrets
+      run: |
+        for secret_name in $(az keyvault secret list --vault-name ${{ inputs.keyvault }} --query "[].{name:name}" --output tsv); do
+          secret_value=$(az keyvault secret show --vault-name "${{ inputs.keyvault }}" --name $secret_name --query value -o tsv)
+          echo "::add-mask::$secret_value"
+          echo "$secret_name=$secret_value" >> $GITHUB_ENV
+        done
+        
+    - name: testing secrets
+      run: |
+        echo "echoing as secret: ${{ secrets.my-secret }}" # doesn't work
+        echo "echoing as env: ${{ env.my-secret }}" # works
