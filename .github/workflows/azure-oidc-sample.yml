@@ -30,7 +30,7 @@ jobs:
         tenant-id: e9846558-c4f0-4312-a89e-ebebe80779a1
         subscription-id: 2e9bfb26-ca29-44f5-8920-72c1b0b37188
         
-    - name: just show some sub stuff
+    - name: print azure subscription info
       run: |
         az account show
         az account show | jq ".id"
