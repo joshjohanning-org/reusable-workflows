@@ -83,9 +83,12 @@ jobs:
           echo "ARM_TENANT_ID=${{ inputs.azure-tenant-id }}" >> "$GITHUB_ENV"
           echo "ARM_USE_OIDC=true" >> "$GITHUB_ENV"
 
-      - name: terraform plan
+      - name: terraform init
         run: | 
           terraform init -input=false ${{ inputs.backend-arg }}
+
+      - name: terraform plan
+        run: | 
           terraform plan -input=false -var-file=${{ inputs.var-file }} ${{ inputs.additional-args }} -out="out.plan"
 
       - name: Upload a Build Artifact
