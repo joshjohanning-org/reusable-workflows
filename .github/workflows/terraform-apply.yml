@@ -89,7 +89,7 @@ jobs:
         with:
           name: ${{ inputs.artifact-name }}
 
-      - run: ls -R
+      - run: ls -R ${{ github.workspace }}
 
       - name: terraform init
         run: | 
@@ -97,4 +97,4 @@ jobs:
 
       - name: terraform apply
         run: |
-          terraform apply -input=false -auto-approve -var-file=${{ inputs.var-file }} ${{ inputs.additional-args }} -out="out.plan"
+          terraform apply -input=false -auto-approve -var-file=${{ inputs.var-file }} ${{ inputs.additional-args }} ${{ github.workspace }}/out.plan
