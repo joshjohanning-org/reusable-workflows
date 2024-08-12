@@ -37,7 +37,7 @@ jobs:
       packages: write
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Build the Docker image
       run: docker build . --file ${{ inputs.dockerfile-path }} --tag ${{ inputs.image-repository }}/${{ inputs.image-name }}:${{ inputs.image-tag }}
