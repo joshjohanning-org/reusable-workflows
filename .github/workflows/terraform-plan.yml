@@ -40,6 +40,9 @@ jobs:
     defaults:
       run:
         working-directory: ${{ inputs.working-directory }}
+    permissions:
+      contents: read
+      id-token: write
         
     steps:
       - uses: actions/checkout@v4
