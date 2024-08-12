@@ -101,7 +101,7 @@ jobs:
       # could also use kishaningithub/setup-tf-summarize@v1
       - name: install tf-summarize
         run: | 
-          curl -O https://github.com/dineshba/tf-summarize/releases/latest/download/tf-summarize_linux_amd64.tar.gz
+          curl -LO https://github.com/dineshba/tf-summarize/releases/latest/download/tf-summarize_linux_amd64.tar.gz
           tar -xvf tf-summarize_linux_amd64.tar.gz
           sudo cp tf-summarize /usr/bin/tf-summarize
 
