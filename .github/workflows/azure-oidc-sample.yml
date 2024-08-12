@@ -24,7 +24,7 @@ jobs:
     - uses: actions/checkout@v4
     # logging in with OIDC
     - name: 'Az CLI login'
-      uses: azure/login@v1
+      uses: azure/login@v2
       with:
         client-id: d951ac80-75f2-446a-aca6-cd53a68611f0
         tenant-id: e9846558-c4f0-4312-a89e-ebebe80779a1
