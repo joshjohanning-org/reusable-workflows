@@ -97,4 +97,4 @@ jobs:
 
       - name: terraform apply
         run: |
-          terraform apply -input=false -auto-approve -var-file=${{ inputs.var-file }} ${{ inputs.additional-args }} ${{ github.workspace }}/out.plan
+          terraform apply -input=false -auto-approve ${{ inputs.additional-args }} ${{ github.workspace }}/out.plan
