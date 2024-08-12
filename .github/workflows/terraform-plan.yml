@@ -77,12 +77,12 @@ jobs:
           subscription-id: ${{ inputs.azure-subscription-id }}
           tenant-id: ${{ inputs.azure-tenant-id }}
 
-      - name: set up tf creds with azure oidc
-        run: |
-          echo "ARM_CLIENT_ID=${{ inputs.azure-client-id }}" >> "$GITHUB_ENV"
-          echo "ARM_SUBSCRIPTION_ID=${{ inputs.azure-subscription-id }}" >> "$GITHUB_ENV"
-          echo "ARM_TENANT_ID=${{ inputs.azure-tenant-id }}" >> "$GITHUB_ENV"
-          echo "ARM_USE_OIDC=true" >> "$GITHUB_ENV"
+      # - name: set up tf creds with azure oidc
+      #   run: |
+      #     echo "ARM_CLIENT_ID=${{ inputs.azure-client-id }}" >> "$GITHUB_ENV"
+      #     echo "ARM_SUBSCRIPTION_ID=${{ inputs.azure-subscription-id }}" >> "$GITHUB_ENV"
+      #     echo "ARM_TENANT_ID=${{ inputs.azure-tenant-id }}" >> "$GITHUB_ENV"
+      #     echo "ARM_USE_OIDC=true" >> "$GITHUB_ENV"
 
       - name: terraform plan
         run: | 
