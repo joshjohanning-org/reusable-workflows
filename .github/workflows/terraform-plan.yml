@@ -57,13 +57,13 @@ jobs:
       - name: Azure login
         uses: azure/login@v2
         with:
-          client-id: d951ac80-75f2-446a-aca6-cd53a68611f0
+          client-id: 3b18bd87-f72b-4260-b1cd-160d08ec9fc3
           subscription-id: 2e9bfb26-ca29-44f5-8920-72c1b0b37188
           tenant-id: e9846558-c4f0-4312-a89e-ebebe80779a1
 
       - name: set up tf creds with azure oidc
         run: |
-          echo "ARM_CLIENT_ID=d951ac80-75f2-446a-aca6-cd53a68611f0" >> "$GITHUB_ENV"
+          echo "ARM_CLIENT_ID=3b18bd87-f72b-4260-b1cd-160d08ec9fc3" >> "$GITHUB_ENV"
           echo "ARM_SUBSCRIPTION_ID=2e9bfb26-ca29-44f5-8920-72c1b0b37188" >> "$GITHUB_ENV"
           echo "ARM_TENANT_ID=e9846558-c4f0-4312-a89e-ebebe80779a1" >> "$GITHUB_ENV"
           echo "ARM_USE_OIDC=true" >> "$GITHUB_ENV"
