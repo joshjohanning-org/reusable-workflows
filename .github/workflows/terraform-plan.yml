@@ -33,7 +33,7 @@ on:
         required: true
       terraform-version:
         description: The version of Terraform to use
-        type: number
+        type: string
         default: 1.9.4
       azure-client-id:
         description: The Azure Client ID to use for authentication
