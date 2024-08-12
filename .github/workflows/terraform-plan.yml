@@ -1,0 +1,115 @@
+name: terraform plan
+
+on:
+  workflow_call:
+    inputs:
+      runs-on:
+        description: Platform to execute on
+        type: string
+        default: ubuntu-latest
+      additional-args:
+        description: Additional arguments to pass in
+        type: string
+        default: ""
+      var-file:
+        description: Environment variable file
+        type: string
+        default: ""
+      backend-arg:
+        description: Environment backend arguments
+        type: string
+        default: ""
+      working-directory:
+        description: Working directory
+        type: string
+        default: .
+      artifact-name:
+        description: Artifact name for plan
+        type: string
+        default: plan
+      environment:
+        description: The name of the GitHub environment
+        type: string
+        required: true
+      terraform-version:
+        description: The version of Terraform to use
+        type: string
+        default: 1.9.4
+      azure-client-id:
+        description: The Azure Client ID to use for authentication
+        type: string
+        required: true
+      azure-subscription-id:
+        description: The Azure Subscription ID to use for authentication
+        type: string
+        required: true
+      azure-tenant-id:
+        description: The Azure Tenant ID to use for authentication
+        type: string
+        required: true
+
+jobs:
+  plan:
+    runs-on: ${{ inputs.runs-on }}
+    environment: ${{ inputs.environment }}
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    permissions:
+      contents: read
+      id-token: write
+        
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ inputs.terraform-version }}
+
+      - name: terraform version
+        run: terraform -v
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ inputs.azure-client-id }}
+          subscription-id: ${{ inputs.azure-subscription-id }}
+          tenant-id: ${{ inputs.azure-tenant-id }}
+
+      - name: set up tf creds with azure oidc
+        run: |
+          echo "ARM_CLIENT_ID=${{ inputs.azure-client-id }}" >> "$GITHUB_ENV"
+          echo "ARM_SUBSCRIPTION_ID=${{ inputs.azure-subscription-id }}" >> "$GITHUB_ENV"
+          echo "ARM_TENANT_ID=${{ inputs.azure-tenant-id }}" >> "$GITHUB_ENV"
+          echo "ARM_USE_OIDC=true" >> "$GITHUB_ENV"
+
+      - name: terraform init
+        run: | 
+          terraform init -input=false ${{ inputs.backend-arg }}
+
+      - name: terraform plan
+        run: | 
+          terraform plan -input=false -var-file=${{ inputs.var-file }} ${{ inputs.additional-args }} -out="out.plan"
+
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: ${{ inputs.working-directory }}/out.plan
+          if-no-files-found: error
+
+      # could also use kishaningithub/setup-tf-summarize@v1
+      - name: install tf-summarize
+        run: | 
+          curl -LO https://github.com/dineshba/tf-summarize/releases/latest/download/tf-summarize_linux_amd64.tar.gz
+          tar -xvf tf-summarize_linux_amd64.tar.gz
+          sudo cp tf-summarize /usr/bin/tf-summarize
+
+      - name: use tf-summarize to generate plan summary
+        run: |
+          tf-summarize -md out.plan > out.plan.md
+
+      - name: add plan summary to job summary
+        run: |
+          echo "## Terraform Plan Summary (${{ inputs.environment }})" >> $GITHUB_STEP_SUMMARY
+          cat out.plan.md >> $GITHUB_STEP_SUMMARY
