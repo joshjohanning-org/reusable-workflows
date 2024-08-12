@@ -1,0 +1,71 @@
+name: terraform plan
+
+on:
+  workflow_call:
+    inputs:
+      runs-on:
+        description: Platform to execute on
+        type: string
+        default: ubuntu-latest
+      additional-args:
+        description: Additional arguments to pass in
+        type: string
+        default: ""
+      var-file:
+        description: Environment variable file
+        type: string
+        default: ""
+      backend-arg:
+        description: Environment backend arguments
+        type: string
+        default: ""
+      working-directory:
+        description: Working directory
+        type: string
+        default: .
+      artifact-name:
+        description: Artifact name for plan
+        type: string
+        default: plan
+      environment:
+        description: The name of the GitHub environment
+        type: string
+        required: true
+
+jobs:
+  terraform-plan:
+    name: plan  
+    runs-on: ${{ inputs.runs-on }}
+    environment: ${{ inputs.environment }}
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+        
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.5.7"
+
+      - name: terraform version
+        run: terraform -v
+
+      - name: set up tf creds with azure oidc
+        run: |
+          echo "ARM_CLIENT_ID=d951ac80-75f2-446a-aca6-cd53a68611f0" >> "$GITHUB_ENV"
+          echo "ARM_SUBSCRIPTION_ID=2e9bfb26-ca29-44f5-8920-72c1b0b37188" >> "$GITHUB_ENV"
+          echo "ARM_TENANT_ID=e9846558-c4f0-4312-a89e-ebebe80779a1" >> "$GITHUB_ENV"
+          echo "ARM_USE_OIDC=true" >> "$GITHUB_ENV"
+
+      - name: terraform plan
+        run: | 
+          terraform init -input=false ${{ inputs.backend-arg }}
+          terraform plan -input=false -var-file=${{ inputs.var-file }} ${{ inputs.additional-args }} -out="out.plan"
+
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: ${{ inputs.working-directory }}/out.plan
+          if-no-files-found: error
