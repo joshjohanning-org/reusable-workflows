@@ -11,10 +11,6 @@ on:
         description: Additional arguments to pass in
         type: string
         default: ""
-      var-file:
-        description: Environment variable file
-        type: string
-        default: ""
       backend-arg:
         description: Environment backend arguments
         type: string
