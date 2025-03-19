@@ -1,0 +1,80 @@
+name: Java Spring Boot Build
+
+on:
+  workflow_call:
+    inputs:
+      runs-on:
+        description: 'Platform to execute on'
+        type: string
+        default: 'ubuntu-latest'
+      java-version:
+        description: 'Java version to use'
+        type: string
+        default: '17'
+      java-distribution:
+        description: 'Java distribution (temurin, adopt, etc.)'
+        type: string
+        default: 'temurin'
+      build-tool:
+        description: 'Build tool to use (maven/gradle)'
+        type: string
+        default: 'maven'
+      build-args:
+        description: 'Additional build arguments'
+        type: string
+        default: ''
+      tests-enabled:
+        description: 'Whether to run tests'
+        type: boolean
+        default: true
+      artifact-name:
+        description: 'Name of the artifact to upload'
+        type: string
+        default: 'app'
+      artifact-path:
+        description: 'Path to the built artifacts'
+        type: string
+        default: 'target/*.jar'
+
+jobs:
+  build:
+    name: Build Spring Boot Application
+    runs-on: ${{ inputs.runs-on }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ inputs.java-version }}
+        distribution: ${{ inputs.java-distribution }}
+        cache: ${{ inputs.build-tool }}
+    
+    - name: Build with Maven
+      if: inputs.build-tool == 'maven'
+      run: |
+        mvn -B clean package ${{ inputs.build-args }} ${{ inputs.tests-enabled != true && '-DskipTests' || '' }}
+    
+    - name: Build with Gradle
+      if: inputs.build-tool == 'gradle'
+      run: |
+        chmod +x ./gradlew
+        ./gradlew build ${{ inputs.build-args }} ${{ inputs.tests-enabled != true && '-x test' || '' }}
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ inputs.artifact-path }}
+        if-no-files-found: error
+        
+    - name: Generate test report
+      if: inputs.tests-enabled == true && (success() || failure())
+      uses: dorny/test-reporter@v1
+      with:
+        name: Test Results
+        path: ${{ inputs.build-tool == 'maven' && '**/surefire-reports/*.xml' || '**/test-results/**/*.xml' }}
+        reporter: java-junit
+        fail-on-error: false
