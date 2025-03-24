@@ -72,7 +72,7 @@ jobs:
         
     - name: Generate test report
       if: inputs.tests-enabled == true && (success() || failure())
-      uses: dorny/test-reporter@v1
+      uses: dorny/test-reporter@v2
       with:
         name: Test Results
         path: ${{ inputs.build-tool == 'maven' && '**/surefire-reports/*.xml' || '**/test-results/**/*.xml' }}
