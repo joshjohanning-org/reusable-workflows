@@ -21,7 +21,7 @@ jobs:
       contents: read # this is needed to clone repo
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     # logging in with OIDC
     - name: 'Az CLI login'
       uses: azure/login@v2
