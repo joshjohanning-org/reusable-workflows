@@ -1,0 +1,38 @@
+name: Spring Boot CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build and Test
+    uses: joshjohanning/reusable-workflows/.github/workflows/java-springboot-build.yml@main
+    with:
+      # Override default settings as needed
+      java-version: '17'
+      build-tool: 'maven'
+      build-args: '-Pprod'
+      tests-enabled: true
+      artifact-name: 'my-springboot-app'
+
+  # Example of additional job that might depend on the build
+  deploy-dev:
+    name: Deploy to Dev
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: my-springboot-app
+
+      - name: Deploy to Development Environment
+        run: |
+          echo "Deploying to development environment..."
+          # Add your deployment commands here
+          ls -la
